@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Management Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>Student Management Dashboard</h1>
+
+<div class="controls">
+    <input type="text" id="search" placeholder="Search by name...">
+
+    <select id="sort">
+        <option value="">Sort By</option>
+        <option value="name">Name (A–Z)</option>
+        <option value="age">Age (Ascending)</option>
+    </select>
+</div>
+
+<table id="studentTable">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Course</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<p id="noResults" class="hidden">No students found.</p>
+
+<h2>Add New Student</h2>
+
+<form id="studentForm">
+    <input type="text" id="name" placeholder="Name">
+    <input type="number" id="age" placeholder="Age">
+    <input type="text" id="course" placeholder="Course">
+    <button type="submit">Add Student</button>
+</form>
+
+<script>
+let students = [];
+let nextId = 1;
+
+const tableBody = document.querySelector("#studentTable tbody");
+const searchInput = document.getElementById("search");
+const sortSelect = document.getElementById("sort");
+const form = document.getElementById("studentForm");
+const noResults = document.getElementById("noResults");
+
+fetch("students.json")
+    .then(response => response.json())
+    .then(data => {
+        students = data;
+        nextId = students.length + 1;
+        displayStudents(students);
+    });
+
+function displayStudents(data) {
+    tableBody.innerHTML = "";
+
+    if (data.length === 0) {
+        noResults.classList.remove("hidden");
+        return;
+    }
+
+    noResults.classList.add("hidden");
+
+    data.forEach(student => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${student.id}</td>
+            <td>${student.name}</td>
+            <td>${student.age}</td>
+            <td>${student.course}</td>
+        `;
+
+        tableBody.appendChild(row);
+    });
+}
+
+searchInput.addEventListener("input", () => {
+    const value = searchInput.value.toLowerCase();
+
+    const filtered = students.filter(student =>
+        student.name.toLowerCase().includes(value)
+    );
+
+    displayStudents(filtered);
+});
+
+sortSelect.addEventListener("change", () => {
+    let sorted = [...students];
+
+    if (sortSelect.value === "name") {
+        sorted.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortSelect.value === "age") {
+        sorted.sort((a, b) => a.age - b.age);
+    }
+
+    displayStudents(sorted);
+});
+
+form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById("name").value.trim();
+    const age = document.getElementById("age").value.trim();
+    const course = document.getElementById("course").value.trim();
+
+    if (!name || !age || !course) {
+        alert("All fields are required.");
+        return;
+    }
+
+    if (/\d/.test(name)) {
+        alert("Name must not contain numbers.");
+        return;
+    }
+
+    if (isNaN(age)) {
+        alert("Age must be a number.");
+        return;
+    }
+
+    const newStudent = {
+        id: nextId++,
+        name,
+        age: Number(age),
+        course
+    };
+
+    students.push(newStudent);
+    displayStudents(students);
+
+    const lastRow = tableBody.lastElementChild;
+    lastRow.classList.add("highlight");
+
+    setTimeout(() => {
+        lastRow.classList.remove("highlight");
+    }, 1500);
+
+    form.reset();
+});
+</script>
+
+</body>
+</html>
