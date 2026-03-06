@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Student Admission Form</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Student Admission Form</h2>
+
+
+<form action="emailcreator.php" method="POST">
+
+    <label>First Name</label>
+    <input type="text" name="firstname" required>
+
+    <label>Last Name</label>
+    <input type="text" name="lastname" required>
+
+    <label>Date of Birth</label>
+    <input type="date" name="dob" required>
+
+    <label>Department</label>
+    <select name="department" required>
+        <option value="">Select Department</option>
+        <option value="cs">Computer Science</option>
+        <option value="it">Information Technology</option>
+        <option value="ba">Business Administration</option>
+        <option value="ee">Electrical Engineering</option>
+    </select>
+
+    <button type="submit">Generate Email</button>
+
+</form>
+
+
+</div>
+
+</body>
+</html>
